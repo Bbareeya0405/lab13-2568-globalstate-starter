@@ -4,6 +4,8 @@ import {
   Text,
   Button,
   Stack,
+  Group,
+  Avatar,
   Table,
   ActionIcon,
   Checkbox,
@@ -43,6 +45,21 @@ export default function TodoTablePage() {
         </ActionIcon>
       </Table.Td>
       {/* เพิ่ม row assignees ตรงนี้*/}
+      <Table.Td>
+        {task.assignees && task.assignees.length > 0 ? (
+          <Group gap="xs">
+            {task.assignees.map((assignee, index) => (
+              <Avatar key={index} size="sm" radius="xl" color="blue">
+                {assignee[0]} {/* ใช้ตัวอักษรแรกของ string */}
+              </Avatar>
+            ))}
+          </Group>
+        ) : (
+          <Text c="dimmed" size="sm">
+            -
+          </Text>
+        )}
+      </Table.Td>
     </Table.Tr>
   ));
 
@@ -71,6 +88,7 @@ export default function TodoTablePage() {
               <Table.Th>Completed</Table.Th>
               <Table.Th>Actions</Table.Th>
               {/* เพิ่ม table header assignees ตรงนี้*/}
+              <Table.Th>Assignees</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>{rows}</Table.Tbody>

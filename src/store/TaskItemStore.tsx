@@ -2,37 +2,46 @@ import { create } from "zustand";
 import { v4 as uuidv4 } from "uuid";
 import { type TaskItemProps } from "../libs/Task";
 
-export const useTaskStore = create<TaskItemProps>((set) => ({
-  tasks: [], //เริ่มต้น
-  setTasks: (tasks) => set({ tasks }),
-  addTask: (title, description, dueDate) =>
-    set((state) => ({
-      tasks: [
-        ...state.tasks,
-        {
-          id: uuidv4(),
-          title,
-          description,
-          dueDate,
-          isDone: false,
-          doneAt: null,
-        },
-      ],
-    })),
-  toggleTask: (id) =>
-    set((state) => ({
-      tasks: state.tasks.map((task) =>
-        task.id === id
-          ? {
-              ...task,
-              isDone: !task.isDone,
-              doneAt: task.isDone ? null : new Date().toLocaleDateString(),
-            }
-          : task
-      ),
-    })),
-  removeTask: (id) =>
-    set((state) => ({
-      tasks: state.tasks.filter((task) => task.id !== id),
-    })),
+export const useTaskStore = create<TaskItemProps>((set, get) => ({
+  tasks: JSON.parse(localStorage.getItem("tasks") || "[]"),
+
+  setTasks: (tasks) => {
+    set({ tasks });
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  },
+
+  addTask: (title, description, dueDate, assignees) => {
+    const newTask = {
+      id: uuidv4(),
+      title,
+      description,
+      dueDate,
+      assignees,
+      isDone: false,
+      doneAt: null,
+    };
+    const updatedTasks = [newTask, ...get().tasks];
+    set({ tasks: updatedTasks });
+    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+  },
+
+  toggleTask: (id) => {
+    const updatedTasks = get().tasks.map((task) =>
+      task.id === id
+        ? {
+            ...task,
+            isDone: !task.isDone,
+            doneAt: task.isDone ? null : new Date().toLocaleDateString(),
+          }
+        : task
+    );
+    set({ tasks: updatedTasks });
+    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+  },
+
+  removeTask: (id) => {
+    const updatedTasks = get().tasks.filter((task) => task.id !== id);
+    set({ tasks: updatedTasks });
+    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+  },
 }));

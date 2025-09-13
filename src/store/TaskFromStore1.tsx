@@ -4,7 +4,9 @@ import { type TaskFormState } from "../libs/Task";
 export const useTaskFormStore = create<TaskFormState>((set) => ({
   title: "",
   description: "",
-  dueDate: "",
+  dueDate: null,
+  assignees: [],
+  
   setTasks: (title) =>
     set(() => ({
       title: title,
@@ -17,10 +19,14 @@ export const useTaskFormStore = create<TaskFormState>((set) => ({
     set(() => ({
       dueDate: dueDate,
     })),
+  setassignees: (assignees) => 
+    set({ assignees }),
+  
   resetForm: () =>
     set({
       title: "",
       description: "",
       dueDate: "",
+      assignees: [],
     }),
 }));

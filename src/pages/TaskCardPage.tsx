@@ -8,15 +8,31 @@ import {
   Group,
   Checkbox,
   ActionIcon,
+  Badge,
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import dayjs from "dayjs";
 import AddTaskModal from "../components/AddTaskModal";
 import { useTaskStore } from "../store/TaskItemStore";
 export default function HomePage() {
-  const { tasks, addTask, toggleTask, removeTask } = useTaskStore();
+  const { tasks, addTask, setTasks, toggleTask, removeTask } = useTaskStore();
   const [modalOpened, setModalOpened] = useState(false);
+  const [FirstLoad, setFirstLoad] = useState(true);
+
+  useEffect(() => {
+    if (FirstLoad) {
+      setFirstLoad(false);
+      const getTasks = localStorage.getItem("tasks");
+      if (getTasks !== null) {
+        setTasks(JSON.parse(getTasks));
+      }
+      return;
+    }
+
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }, [FirstLoad, setTasks, tasks]);
+
 
   return (
     <Container size="lg" py="lg">
@@ -24,7 +40,7 @@ export default function HomePage() {
         <Title order={2}>Todo List Card</Title>
         <Text size="sm" c="dimmed">
           All : {tasks.length} | Done :
-          {tasks.filter((t: any) => t.isDone).length}
+          {tasks.filter(t => t.isDone).length}
         </Text>
         {/* Button เรียกใช้งาน Modal*/}
         <Button onClick={() => setModalOpened(true)}>Add Task</Button>
@@ -41,6 +57,14 @@ export default function HomePage() {
               <Group justify="space-between" align="flex-start">
                 <Stack>
                   {/* เพิ่ม assignees ตรงนี้*/}
+                  <Group>
+                    {task.assignees.map((assignee) => (
+                      <Badge color="blue" variant="light">
+                        {assignee}
+                      </Badge>
+                    ))}
+                  </Group>
+
                   <Text
                     fw={600}
                     td={task.isDone ? "line-through" : "none"}
@@ -62,7 +86,7 @@ export default function HomePage() {
                     </Text>
                   )}
                   {task.doneAt && (
-                    <Text size="xs" c="chanadda">
+                    <Text size="xs" c="baer">
                       Done at: {dayjs(task.doneAt).format("ddd MMM DD YYYY")}
                     </Text>
                   )}
